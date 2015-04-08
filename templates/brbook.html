@@ -1,0 +1,173 @@
+$def with (cardForm, bookForm, param, session)
+$if session.login == 1:
+    $ log = "Logout"
+    $ url = "logout"
+$else:
+    $ log = "Login"
+    $ url = "login"
+$if param == "borrowbook":
+    $ mess = "Borrow"
+$else:
+    $ mess = "Return"
+
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport", content="width-device-width, inital-scale=1">
+    <head>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <script src="/js/stupidtable.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <script src="/js/jquery.form.js"></script> 
+        <script type="text/javascript">
+          $$(document).ready( function() {
+            $$('#cardForm').ajaxForm({
+              success: function(json) {
+                $$('#cardForm').toggle();
+                $$('#bookForm').toggle();
+                if (json) {
+                  var j = JSON.parse(json);
+                  for (var i = 0, len = j.length; i < len; ++i) {
+                    $$('#booklist').append("<tr><td>" + j[i].book_num + "</td><td>" + j[i].type + "</td><td>" + j[i].title + "</td><td>" + j[i].press + "</td><td>" + j[i].year + "</td><td>" + j[i].author + "</td><td>" + j[i].price + "</td><td>" + j[i].stock + "</td></tr>");
+                  }
+                  $$('#booklist').toggle();
+                }
+              },
+              error: function(response) {
+                if (response.responseText === "card_num error") {
+                  $$('#cardNumError').fadeIn("slow", function() {
+                    $$(this).delay(2000).fadeOut("slow");
+                  });                  
+                }
+              }
+            });
+
+            $$('#bookForm').ajaxForm({
+              success: function(json) {
+                $$('#success').fadeIn("slow", function() {
+                  $$(this).delay(2000).fadeOut("slow", function() {
+                    // window.location.href="/$param";
+                  });
+                  $$("#booklist").find("tr:gt(0)").remove();
+                  $$("#cardForm").ajaxSubmit({
+                    success: function(json) {
+                      if (json) {
+                        var j = JSON.parse(json);
+                        for (var i = 0, len = j.length; i < len; ++i) {
+                          $$('#booklist').append("<tr><td>" + j[i].book_num + "</td><td>" + j[i].type + "</td><td>" + j[i].title + "</td><td>" + j[i].press + "</td><td>" + j[i].year + "</td><td>" + j[i].author + "</td><td>" + j[i].price + "</td><td>" + j[i].stock + "</td></tr>");
+                        }
+                      }
+                    }
+                  });
+                });
+              },
+              error: function(response) {
+                if (response.responseText === "card_num error") {
+                  $$('#cardNumError').fadeIn("slow", function() {
+                    $$(this).delay(2000).fadeOut("slow");
+                  });                  
+                } else if (response.responseText === "book_num error") {
+                  $$('#bookNumError').fadeIn("slow", function() {
+                    $$(this).delay(2000).fadeOut("slow");
+                  });                                    
+                } else if (response.responseText === "stock error") {
+                  $$('#stockError').fadeIn("slow", function() {
+                    $$(this).delay(1000).fadeOut("slow");
+                  });                                    
+                }
+              }
+            })
+            $$('#booklist').stupidtable();
+          });
+        </script>
+    </head>
+    <body>
+      <header class="navbar navbar-static-top">
+        <div class="container">
+        <nav class="collapse navbar-collapse bs-navbar-collapse">
+          <ul class="nav navbar-nav col-centered">
+            <li>
+              <a href="/$url">$log</a>
+            </li>
+            <li>
+              <a href="/admin/managecard">Add/Remove a card</a>
+            </li>
+            <li>
+              <a href="/admin/addbook">Add books</a>
+            </li>
+            <li>
+              <a href="/admin/addadmin">Add a administrator</a>
+            </li>
+            <li>
+              <a href="/querybooks"> Query books</a>
+            </li>
+            <li>
+              <a href="/borrowbook">Borrow a book</a>
+            </li>
+            <li>
+              <a href="/returnbook">Return a book</a>
+            </li>
+          </ul>
+        </nav>
+        </div>
+      </header>
+      <div class="main-header">
+        <div class="container">
+          <h1 class="lead text-center">
+            Welcome to Library Management System!
+          </h1>
+        </div>
+      </div>
+      <div class="jumbotron">
+        <div class="container col-md-3 col-centered placeholder">
+          <div id = "cardNumError" style="display:none" class="text-center alert alert-danger" role="alert">
+            Error Card ID! Please recheck it.
+          </div>
+          <div id = "bookNumError" style="display:none" class="text-center alert alert-danger" role="alert">
+            Error Book Number! Please recheck it.
+          </div>
+          <div id = "stockError" style="display:none" class="text-center alert alert-danger" role="alert">
+            No available stock!
+          </div>
+          <div id = "success" style="display:none" class="text-center alert alert-success" role="alert">
+            $mess successfully!
+          </div>
+          <form method="GET" action="/$param" id="cardForm">
+            <div class="form-group">
+                $:cardForm.render_css()
+            </div>
+            <div class="form-group text-center">
+              <button type="submit" class="btn btn-primary col-centered">Submit</button>
+            </div>
+          </form>
+          <form method="POST" action="/$param" id="bookForm" style="display:none">
+            <div class="form-group">
+                $:bookForm.render_css()
+            </div>
+            <div class="form-group text-center">
+              <button type="submit" class="btn btn-primary col-centered">Submit</button>
+            </div>
+          </form>
+        </div>
+        <div class="container col-md-7 col-centered placeholder">
+          <table class="table table-hover" style="display:none" id="booklist">
+            <thead>
+              <tr>
+                <th data-sort="string">Book Number</th>
+                <th data-sort="string">Book type</th>
+                <th data-sort="string">Book name</th>
+                <th data-sort="string">Press</th>
+                <th data-sort="int">Year</th>
+                <th data-sort="string">Author</th>
+                <th data-sort="float">Price</th>
+                <th data-sort="int">Stock</th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+
+    </body>
+</html>

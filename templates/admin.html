@@ -1,0 +1,129 @@
+$def with (session)
+$if session.login == 1:
+    $ log = "Logout"
+    $ url = "logout"
+$else:
+    $ log = "Login"
+    $ url = ""
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport", content="width-device-width, inital-scale=1">
+    <head>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <script src="/js/jquery.form.js"></script> 
+        <script type="text/javascript">
+          $$(document).ready( function() {
+            if (window.location.hash) {
+              if (window.location.hash.substring(1) === "login") {
+                $$("#logininfo").fadeIn("slow", function() {
+                  $$(this).delay(2000).fadeOut("slow");
+                });
+              } else if (window.location.hash.substring(1) === "logout") {
+                $$('#logoutinfo').fadeIn("slow", function() {
+                  $$(this).delay(2000).fadeOut("slow");
+                });
+              }
+            }
+            $$('#loginForm').ajaxForm({
+              success: function() {
+                $$('#loginsucceed').fadeIn("slow", function() {
+                  $$('#loginsucceed').delay(2000).fadeOut("slow", function() {
+                    window.location.href = "/admin";
+                  });
+                });
+              },
+              error: function() {
+                $$('#loginfailed').fadeIn("slow", function() {
+                  $$('#loginfailed').delay(2000).fadeOut("slow");
+                });
+              }
+            });
+          });
+        </script>
+    </head>
+
+    <body>
+      <header class="navbar navbar-static-top">
+        <div class="container">
+        <nav class="collapse navbar-collapse bs-navbar-collapse">
+          <ul class="nav navbar-nav col-centered">
+            <li>
+              <a href="/$url">$log</a>
+            </li>
+            <li>
+              <a href="/admin/managecard">Add/Remove a card</a>
+            </li>
+            <li>
+              <a href="/admin/addbook">Add books</a>
+            </li>
+            <li>
+              <a href="/admin/addadmin">Add a administrator</a>
+            </li>
+            <li>
+              <a href="/querybooks"> Query books</a>
+            </li>
+            <li>
+              <a href="/borrowbook">Borrow a book</a>
+            </li>
+            <li>
+              <a href="/returnbook">Return a book</a>
+            </li>
+          </ul>
+        </nav>
+        </div>
+      </header>
+
+      <main>
+        <div class="main-header">
+          <div class="container">
+            <h1 class="lead text-center">
+              Welcome to Library Management System!
+            </h1>
+          </div>
+        </div>
+        <div class="jumbotron">
+          <div class="container col-md-4 col-centered placeholder">
+            <div id = "logininfo" style="display:none" class="text-center alert alert-danger" role="alert">
+              You must login first!
+            </div>
+            <div id = "logoutinfo" style="display:none" class="text-center alert alert-success" role="alert">
+              You are now logged out
+            </div>
+            <div id = "loginfailed" style="display:none" class="text-center alert alert-danger" role="alert">
+              Sorry, Username or Password wrong!
+            </div>
+            <div id = "loginsucceed" style="display:none" class="text-center alert alert-success" role="alert">
+              Login succeed!
+            </div>
+            <p>
+                Intro:
+            </p>
+            <p>
+                Welcome to Library Management System powered by Orpine. </br>
+                In this site, you can: </br>
+                <a href="/admin/managecard">Add / Remove a library card</a></br>
+                <a href="/admin/addbook">Add books</a></br>
+                <a href="/admin/addadmin">Add an administrator</a></br>
+                <a href="/querybooks">Query books stored in library</a></br>
+                <a href="/borrowbook">Process a borrow book request</a></br>
+                <a href="/borrowbook">Process a return book request</a></br>
+            </p>
+            <p>
+                Note:
+            </p>
+            <p>
+                I didn't write any error handling(including duplicate error handling) on add book list, </br>
+                so please make sure you are upload a correct list, here is a <a href="/statics/upload.txt">example</a></br></br>
+
+                You can sort the query result by click the table header
+<!--                 If you find any error, please contact me at orpine at msn dot com.
+ -->            </p>            
+          </div>
+        </div>
+      </main>
+    </body>
+</html>

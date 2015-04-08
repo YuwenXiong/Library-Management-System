@@ -1,0 +1,171 @@
+$def with (addbookForm, appendbookForm, addbooklistForm, session)
+$if session.login == 1:
+    $ log = "Logout"
+    $ url = "logout"
+$else:
+    $ log = "Login"
+    $ url = "login"
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport", content="width-device-width, inital-scale=1">
+    <head>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <script src="/js/jquery.form.js"></script> 
+        <script type="text/javascript">
+          $$(document).ready( function() {
+            $$('#addbookForm').ajaxForm({
+              success: function() {
+                $$('#addSucceed').fadeIn("slow", function() {
+                  $$(this).delay(2000).fadeOut("slow");
+                });
+              },
+              error: function(response) {
+                if (response.responseText === "error") {
+                  $$('#addInfoError').fadeIn("slow", function() {
+                    $$(this).delay(2000).fadeOut("slow");
+                  });                  
+                } else {
+                  alert(response.responseText);
+                }
+              }
+            });
+
+            $$('#appendbookForm').ajaxForm({
+              success: function() {
+                $$('#appendSucceed').fadeIn("slow", function() {
+                  $$(this).delay(2000).fadeOut("slow");
+                });
+              },
+              error: function(response) {
+                if (response.responseText === "error") {
+                  $$('#appendInfoError').fadeIn("slow", function() {
+                    $$(this).delay(2000).fadeOut("slow");
+                  });                  
+                }
+              }
+            });
+
+            $$('#addbooklistForm').ajaxForm({
+              success: function() {
+                $$('#addListSucceed').fadeIn("slow", function() {
+                  $$(this).delay(2000).fadeOut("slow");
+                });                
+              }
+            })
+          });
+        </script>
+    </head>
+    <body>
+      <header class="navbar navbar-static-top">
+        <div class="container">
+        <nav class="collapse navbar-collapse bs-navbar-collapse">
+          <ul class="nav navbar-nav col-centered">
+            <li>
+              <a href="/$url">$log</a>
+            </li>
+            <li>
+              <a href="/admin/managecard">Add/Remove a card</a>
+            </li>
+            <li>
+              <a href="/admin/addbook">Add books</a>
+            </li>
+            <li>
+              <a href="/admin/addadmin">Add a administrator</a>
+            </li>
+            <li>
+              <a href="/querybooks"> Query books</a>
+            </li>
+            <li>
+              <a href="/borrowbook">Borrow a book</a>
+            </li>
+            <li>
+              <a href="/returnbook">Return a book</a>
+            </li>
+        </nav>
+        </div>
+      </header>
+      <div class="main-header">
+        <div class="container">
+          <h1 class="lead text-center">
+            Welcome to Library Management System!
+          </h1>
+        </div>
+      </div>
+      <div class="jumbotron">
+        <div class="container col-md-5 col-centered placeholder">
+        <div role="tabpanel">
+          <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li role="presentation" class="active">
+              <a href="#add" aria-controls="add" role="tab" data-toggle="tab">Add a book</a>
+            </li>            
+            <li role = "presentation">
+              <a href="#append" aria-controls="append" role="tab" data-toggle="tab">Append stock</a>
+            </li>
+            <li role = "presentation">
+              <a href="#addList" aria-controls="addList" role="tab" data-toggle="tab">Add book list</a>
+            </li>
+          </ul>
+          <div class="container col-md-8 col-centered placeholder">
+            <div class="tab-content">
+              </br>
+              <div role="tabpanel" class="tab-pane fade in active" id="add">
+                <div id = "addSucceed" style="display:none" class="text-center alert alert-success" role="alert">
+                  Operation successfully completed
+                </div>        
+                <div id = "addInfoError" style="display:none" class="text-center alert alert-danger" role="alert">
+                  Error! Please recheck your input info
+                </div>
+                <form method="post" action="/admin/addbook" id="addbookForm">
+                  <div class="form-group">
+                      $:addbookForm.render_css()
+                  </div>
+                  <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </form>              
+              </div>
+              <div role="tabpanel" class="tab-pane fade" id="append">
+                </br>
+                <div id = "appendSucceed" style="display:none" class="text-center alert alert-success" role="alert">
+                  Operation successfully completed
+                </div>        
+                <div id = "appendInfoError" style="display:none" class="text-center alert alert-danger" role="alert">
+                  Error! Please recheck your input info
+                </div>
+                <form method="post" action="/admin/addbook" id="appendbookForm">
+                  <div class="form-group">
+                      $:appendbookForm.render_css()
+                  </div>
+                  <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </form>
+              </div>
+              <div role="tabpanel" class="tab-pane fade" id="addList">
+                </br>
+                <div id = "addListSucceed" style="display:none" class="text-center alert alert-success" role="alert">
+                  Operation successfully completed
+                </div>        
+                <p class="help-block">
+                  If you want to add lots of books, you may upload a book list:</br>
+                  Format: </br>(book number, book type, book name, press, year, author, price, amount)
+                </p>
+                <form method="post" action="/admin/addbooklist" id="addbooklistForm">
+                  <div class="form-group">
+                      $:addbooklistForm.render_css()
+                  </div>
+                  <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+</html>
