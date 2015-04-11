@@ -36,6 +36,8 @@ class Logout:
 
 class Admin:
     def GET(self):
+        if web.ctx.session.login != 1:
+            raise web.seeother('/#login')
         return render.admin(web.ctx.session)
 
 class ManageCard:
@@ -161,7 +163,7 @@ class AddAdmin:
         if web.ctx.session.login != 1:
             raise web.seeother('/#login')
         data = web.input()
-        ret = models.addadmin(data['username'], data['password'], data['real_name'], data['contact_info'])
+        ret = models.addAdmin(data['username'], data['password'], data['real_name'], data['contact_info'])
         if ret == 0:
             return "Insert succeed"
         else:

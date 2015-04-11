@@ -77,6 +77,9 @@ class BorrowBook():
         l = models.borrowBook(session.cid, book_num['book_num'], session.uid)
         if l == 0:
             return "Success!"
+        elif l.startswith("stock error"):
+            # print l.split('+')[1]
+            raise app.internalerror(mess = l.split('+')[1])
         else:
             raise app.internalerror(mess = l)
 
@@ -110,8 +113,6 @@ class ReturnBook():
 
 class QueryBooks():
     def GET(self):
-        if session.login != 1:
-            raise web.seeother('/#login')
         query = form.Form(
             form.Textbox('type', description = 'Book type', class_ = 'form-control'),
             form.Textbox('title', description = 'Book name', class_ = 'form-control'),
@@ -125,8 +126,6 @@ class QueryBooks():
             )
         return render.querybooks(query, session)
     def POST(self):
-        if session.login != 1:
-            raise web.seeother('/#login')
         query = web.input()
         l = models.queryBookList(query.get('type'), query.get('title'), query.get('press'), (query.get('yearfrom'), query.get('yearto')), query.get('author'), (query.get('pricefrom'), query.get('priceto')))
         if l == -1:

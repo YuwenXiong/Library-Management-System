@@ -85,7 +85,10 @@ def borrowBook(cid, book_num, uid):
 	if l == []:
 		return "book_num error"
 	elif l[0]['stock'] == 0:
-		return "stock error" 
+		q = "SELECT return_date FROM Record WHERE bid = '%s' ORDER BY return_date desc" % l[0]['bid']
+		l = db.query(q).list()
+		print str(l[0]['return_date'])
+		return "stock error+" + str(l[0]['return_date'])
 	else:
 		q = "UPDATE Book SET stock = %s WHERE book_num = '%s'" % (l[0]['stock'] - 1, book_num)
 		db.query(q)
@@ -123,22 +126,23 @@ def queryBookList(bookType, title, press, year, author, price):
 	whereClauseList = [];
 
 	if (bookType != ''):
-		whereClauseList.append("type = '%s'" % bookType)
+		whereClauseList.append("type LIKE '%s'" % ('%' + bookType + '%'))
 	if (title != ''):
-		whereClauseList.append("title = '%s'" % title)		
+		whereClauseList.append("title LIKE '%s'" % ('%' + title + '%'))		
 	if (press != ''):
-		whereClauseList.append("press = '%s'" % press)		
+		whereClauseList.append("press LIKE '%s'" % ('%' + press + '%'))		
 	if (year[0] != '' and year[1] != ''):
-		whereClauseList.append("year between '%s' and '%s' " % (year[0], year[1]))
+		print (year[0], year[1])
+		whereClauseList.append("year BETWEEN '%s' AND '%s'" % (year[0], year[1]))
 	if (author != ''):
-		whereClauseList.append("author = '%s'" % author)
+		whereClauseList.append("author LIKE '%s'" % ('%' + author + '%'))
 	if (price[0] != '' and price[1] != ''):
-		whereClauseList.append("price between '%s' and '%s'" % (price[0], price[1]))
+		whereClauseList.append("price BETWEEN '%s' AND '%s'" % (price[0], price[1]))
 
 	if (whereClauseList == []):
 		whereClause += "TRUE"
 	else:
-		whereClause += " and ".join(x for x in whereClauseList)
+		whereClause += " AND ".join(x for x in whereClauseList)
 
 	booklist = db.query(main + whereClause).list()
 	return booklist
